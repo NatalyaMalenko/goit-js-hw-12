@@ -86,11 +86,25 @@ const onSearchFormSubmit = async event => {
 const onLoadMoreBtnClick = async () => {
   try {
     page++;
+    loader.classList.add('active'); // Показати індикатор завантаження
     const response = await fetchSearch(query, page);
+    loader.classList.remove('active'); // Приховати індикатор завантаження
     imagesListEl.insertAdjacentHTML(
       'beforeend',
       imagesCardTemplate(response.data.hits)
     );
+    lightbox.refresh(); // Оновити SimpleLightbox
+    if (page * 15 >= response.data.totalHits) {
+      loadMoreBtn.classList.add('is-hidden');
+      loadMoreBtn.removeEventListener('click', onLoadMoreBtnClick);
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
+    } else {
+      loadMoreBtn.classList.remove('is-hidden');
+      loadMoreBtn.addEventListener('click', onLoadMoreBtnClick);
+    }
     const cardHeight = document
       .querySelector('.gallery-card')
       .getBoundingClientRect().height;
@@ -98,11 +112,6 @@ const onLoadMoreBtnClick = async () => {
     window.scrollBy({
       top: cardHeight * 2,
       behavior: 'smooth',
-    });
-
-    lightbox = new SimpleLightbox('.gallery a', {
-      captionsData: 'alt',
-      captionDelay: 250,
     });
   } catch (err) {
     console.log(err);
