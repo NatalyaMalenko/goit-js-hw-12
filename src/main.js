@@ -93,6 +93,7 @@ const onLoadMoreBtnClick = async () => {
       'beforeend',
       imagesCardTemplate(response.data.hits)
     );
+
     lightbox.refresh(); // Оновити SimpleLightbox
     if (page * 15 >= response.data.totalHits) {
       loadMoreBtn.classList.add('is-hidden');
